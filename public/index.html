@@ -3,80 +3,86 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GitBoy - Habit Contribution Graph</title>
+  <title>GitBoy - Habit Tracker</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="gameboy">
     <div class="screen-container">
       <div class="screen">
-        <div class="header">
-          <h1>GITBOY</h1>
-          <p class="subtitle">HABIT TRACKER</p>
-        </div>
-        <div class="contribution-graph">
-          <div class="months">
-            <span>Jan</span>
-            <span>Feb</span>
-            <span>Mar</span>
-            <span>Apr</span>
-            <span>May</span>
-            <span>Jun</span>
-            <span>Jul</span>
-            <span>Aug</span>
-            <span>Sep</span>
-            <span>Oct</span>
-            <span>Nov</span>
-            <span>Dec</span>
+        <div id="main-view">
+          <div class="header" id="habit-header">
+            <h1 id="habit-title">LOADING...</h1>
+            <p class="subtitle" id="habit-status">HABIT TRACKER</p>
           </div>
-          <div class="graph-container">
-            <div class="days">
-              <span>Mon</span>
-              <span>Wed</span>
-              <span>Fri</span>
+          <div class="pet-container">
+            <pre id="ascii-penguin" class="ascii-art">
+    (o_
+    //\
+    V_/_
+            </pre>
+          </div>
+          <div class="habit-controls-view">
+             <div class="status-indicator" id="status-text">NOT DONE</div>
+          </div>
+        </div>
+
+        <div id="graph-view" class="hidden">
+           <div class="header">
+            <h1>POKEDEX</h1>
+            <p class="subtitle">CONTRIBUTION MAP</p>
+          </div>
+          <div class="contribution-graph">
+            <div class="months">
+              <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
             </div>
-            <div class="grid" id="grid"></div>
+            <div class="graph-container">
+              <div class="days">
+                <span>M</span><span>W</span><span>F</span>
+              </div>
+              <div class="grid" id="grid"></div>
+            </div>
           </div>
         </div>
-        <div class="legend">
-          <span>Less</span>
-          <div class="legend-squares">
-            <div class="square level-0"></div>
-            <div class="square level-1"></div>
-            <div class="square level-2"></div>
-            <div class="square level-3"></div>
-            <div class="square level-4"></div>
+
+        <div id="add-view" class="hidden">
+          <div class="header">
+            <h1>NEW HABIT</h1>
           </div>
-          <span>More</span>
-        </div>
-        <div class="stats">
-          <div class="stat">
-            <span class="stat-value" id="total-contributions">0</span>
-            <span class="stat-label">CONTRIBUTIONS</span>
+          <div class="form-group">
+            <label>NAME:</label>
+            <input type="text" id="new-habit-name" maxlength="10">
           </div>
-          <div class="stat">
-            <span class="stat-value" id="current-streak">0</span>
-            <span class="stat-label">CURRENT STREAK</span>
+          <div class="form-group">
+            <label>COLOR:</label>
+            <input type="color" id="new-habit-color" value="#9bbc0f">
           </div>
+          <p class="hint">PRESS START TO SAVE</p>
         </div>
       </div>
     </div>
     <div class="controls">
       <div class="dpad">
         <div class="dpad-up"></div>
-        <div class="dpad-right"></div>
+        <div class="dpad-right" id="btn-next"></div>
         <div class="dpad-down"></div>
-        <div class="dpad-left"></div>
+        <div class="dpad-left" id="btn-prev"></div>
         <div class="dpad-center"></div>
       </div>
       <div class="buttons">
-        <button class="btn btn-b" id="btn-reset">B</button>
-        <button class="btn btn-a" id="btn-add">A</button>
+        <button class="btn btn-b" id="btn-x">X</button>
+        <button class="btn btn-a" id="btn-check">✓</button>
       </div>
     </div>
-    <div class="button-labels">
-      <span>RESET</span>
-      <span>ADD</span>
+    <div class="bottom-controls">
+      <div class="start-select">
+        <div class="utility-btn" id="btn-minus">-</div>
+        <div class="utility-btn" id="btn-plus">+</div>
+      </div>
+      <div class="utility-labels">
+        <span>MINUS</span>
+        <span>PLUS</span>
+      </div>
     </div>
   </div>
   <script src="script.js"></script>

@@ -1,105 +1,131 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const grid = document.getElementById('grid');
-  const totalContributions = document.getElementById('total-contributions');
-  const currentStreak = document.getElementById('current-streak');
-  const btnAdd = document.getElementById('btn-add');
-  const btnReset = document.getElementById('btn-reset');
+  const state = {
+    habits: JSON.parse(localStorage.getItem('habits')) || [
+      { name: 'WATER', color: '#9bbc0f', history: {} }
+    ],
+    currentIndex: 0,
+    view: 'main' // 'main', 'graph', 'add'
+  };
 
-  const STORAGE_KEY = 'gitboy-contributions';
-  const TOTAL_DAYS = 364;
+  const elements = {
+    screen: document.querySelector('.screen'),
+    mainView: document.getElementById('main-view'),
+    graphView: document.getElementById('graph-view'),
+    addView: document.getElementById('add-view'),
+    habitTitle: document.getElementById('habit-title'),
+    penguin: document.getElementById('ascii-penguin'),
+    statusText: document.getElementById('status-text'),
+    grid: document.getElementById('grid'),
+    newName: document.getElementById('new-habit-name'),
+    newColor: document.getElementById('new-habit-color')
+  };
 
-  let contributions = loadContributions();
+  const penguins = {
+    happy: `
+    (o_
+    //\\
+    V_/_`,
+    sad: `
+    (x_
+    //\\
+    V_/_`
+  };
 
-  function loadContributions() {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      return JSON.parse(saved);
+  function save() {
+    localStorage.setItem('habits', JSON.stringify(state.habits));
+  }
+
+  function getTodayKey() {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  function updateUI() {
+    const habit = state.habits[state.currentIndex];
+    
+    // Views
+    elements.mainView.classList.toggle('hidden', state.view !== 'main');
+    elements.graphView.classList.toggle('hidden', state.view !== 'graph');
+    elements.addView.classList.toggle('hidden', state.view !== 'add');
+
+    if (state.view === 'main' && habit) {
+      elements.habitTitle.textContent = habit.name;
+      elements.screen.style.backgroundColor = habit.color;
+      const done = habit.history[getTodayKey()];
+      elements.penguin.textContent = done ? penguins.happy : penguins.sad;
+      elements.statusText.textContent = done ? 'COMPLETED!' : 'NOT DONE';
     }
-    return Array(TOTAL_DAYS).fill(0);
+
+    if (state.view === 'graph') {
+      renderGraph();
+    }
   }
 
-  function saveContributions() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(contributions));
-  }
-
-  function getLevel(count) {
-    if (count === 0) return 0;
-    if (count <= 2) return 1;
-    if (count <= 4) return 2;
-    if (count <= 6) return 3;
-    return 4;
-  }
-
-  function createGrid() {
-    grid.innerHTML = '';
-    for (let i = 0; i < TOTAL_DAYS; i++) {
+  function renderGraph() {
+    elements.grid.innerHTML = '';
+    const habit = state.habits[state.currentIndex];
+    const today = new Date();
+    // Show last 182 days (26 weeks)
+    for (let i = 181; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(today.getDate() - i);
+      const key = date.toISOString().split('T')[0];
       const cell = document.createElement('div');
-      cell.className = `cell level-${getLevel(contributions[i])}`;
-      cell.dataset.index = i;
-      cell.title = `Day ${i + 1}: ${contributions[i]} contributions`;
-      
-      cell.addEventListener('click', () => {
-        contributions[i]++;
-        updateCell(cell, i);
-        saveContributions();
-        updateStats();
-      });
-      
-      grid.appendChild(cell);
+      cell.className = 'cell' + (habit.history[key] ? ' level-1' : '');
+      elements.grid.appendChild(cell);
     }
   }
 
-  function updateCell(cell, index) {
-    cell.className = `cell level-${getLevel(contributions[index])}`;
-    cell.title = `Day ${index + 1}: ${contributions[index]} contributions`;
-  }
+  // Controls
+  document.getElementById('btn-next').onclick = () => {
+    state.currentIndex = (state.currentIndex + 1) % state.habits.length;
+    updateUI();
+  };
 
-  function updateStats() {
-    const total = contributions.reduce((sum, count) => sum + count, 0);
-    totalContributions.textContent = total;
+  document.getElementById('btn-prev').onclick = () => {
+    state.currentIndex = (state.currentIndex - 1 + state.habits.length) % state.habits.length;
+    updateUI();
+  };
 
-    let streak = 0;
-    for (let i = contributions.length - 1; i >= 0; i--) {
-      if (contributions[i] > 0) {
-        streak++;
-      } else {
-        break;
+  document.getElementById('btn-check').onclick = () => {
+    if (state.view === 'main') {
+      state.habits[state.currentIndex].history[getTodayKey()] = true;
+      save();
+      updateUI();
+    }
+  };
+
+  document.getElementById('btn-x').onclick = () => {
+    if (state.view === 'main') {
+      delete state.habits[state.currentIndex].history[getTodayKey()];
+      save();
+      updateUI();
+    }
+  };
+
+  document.getElementById('btn-plus').onclick = () => {
+    state.view = state.view === 'add' ? 'main' : 'add';
+    updateUI();
+  };
+
+  document.getElementById('btn-minus').onclick = () => {
+    state.view = state.view === 'graph' ? 'main' : 'graph';
+    updateUI();
+  };
+
+  // Keyboard/Start simulation for Add
+  window.onkeydown = (e) => {
+    if (e.key === 'Enter' && state.view === 'add') {
+      const name = elements.newName.value.trim().toUpperCase();
+      if (name) {
+        state.habits.push({ name, color: elements.newColor.value, history: {} });
+        state.currentIndex = state.habits.length - 1;
+        state.view = 'main';
+        elements.newName.value = '';
+        save();
+        updateUI();
       }
     }
-    currentStreak.textContent = streak;
-  }
+  };
 
-  function getTodayIndex() {
-    const now = new Date();
-    const startOfYear = new Date(now.getFullYear(), 0, 1);
-    const dayOfYear = Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24));
-    return Math.min(dayOfYear, TOTAL_DAYS - 1);
-  }
-
-  btnAdd.addEventListener('click', () => {
-    const todayIndex = getTodayIndex();
-    contributions[todayIndex]++;
-    const cells = grid.querySelectorAll('.cell');
-    if (cells[todayIndex]) {
-      updateCell(cells[todayIndex], todayIndex);
-      cells[todayIndex].style.transform = 'scale(1.5)';
-      setTimeout(() => {
-        cells[todayIndex].style.transform = '';
-      }, 200);
-    }
-    saveContributions();
-    updateStats();
-  });
-
-  btnReset.addEventListener('click', () => {
-    if (confirm('Reset all contributions?')) {
-      contributions = Array(TOTAL_DAYS).fill(0);
-      saveContributions();
-      createGrid();
-      updateStats();
-    }
-  });
-
-  createGrid();
-  updateStats();
+  updateUI();
 });
