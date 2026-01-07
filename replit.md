@@ -19,11 +19,9 @@ GitBoy is a simple habit tracker that displays your contributions in a GitHub-st
 
 ```
 /
-├── server.js          # Express server (port 5000)
-├── public/
-│   ├── index.html     # Main HTML structure
-│   ├── styles.css     # Game Boy styling
-│   └── script.js      # Interactive functionality
+├── index.html     # Main HTML structure
+├── styles.css     # Game Boy styling
+├── script.js      # Interactive functionality
 ├── package.json       # Node.js dependencies
 └── README.md          # Project description
 ```

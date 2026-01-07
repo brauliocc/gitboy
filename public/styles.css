@@ -9,17 +9,16 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  font-family: 'Press Start 2P', monospace, sans-serif;
+  background: #1a1a2e;
+  /* Original font from Gameboy labels */
+  font-family: sans-serif; 
+  font-weight: bold;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
 .gameboy {
-  background: linear-gradient(145deg, #8b8b8b 0%, #c5c5c5 50%, #8b8b8b 100%);
+  background: #c5c5c5;
   border-radius: 20px 20px 60px 20px;
   padding: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   width: 380px;
 }
 
@@ -38,68 +37,226 @@ body {
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow: hidden;
-  transition: background-color 0.3s;
+}
+
+/* Logic for the black start screen */
+.screen.is-empty {
+  background: #000 !important;
 }
 
 .hidden { display: none !important; }
 
-.header { text-align: center; margin-bottom: 10px; }
-.header h1 { font-size: 14px; color: #0f380f; }
-.subtitle { font-size: 8px; color: #306230; }
+.header {
+  text-align: center;
+  height: 50px;
+  width: 100%;
+}
+
+.header h1 {
+  font-size: 14px;
+  color: #0f380f;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  font-size: 9px;
+  color: #306230;
+  margin-top: 4px;
+}
+
+.nav-previews {
+  display: flex;
+  justify-content: space-between;
+  font-size: 8px;
+  margin-bottom: 4px;
+  height: 12px;
+}
 
 .pet-container {
   flex: 1;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 10px 0;
+  width: 100%;
+}
+
+#empty-state {
+  color: #fff;
+  font-size: 10px;
+  text-align: center;
 }
 
 .ascii-art {
   font-family: monospace;
-  font-size: 16px;
-  line-height: 1.2;
-  color: #0f380f;
+  font-size: 38px;
+  line-height: 1.1;
   white-space: pre;
 }
 
+/* Centered status box positioned above trash bin */
 .status-indicator {
   text-align: center;
   font-size: 10px;
-  color: #0f380f;
-  padding: 5px;
+  padding: 10px;
   border: 2px solid #0f380f;
+  margin: 0 auto 30px auto; 
+  width: 85%;
 }
 
-.contribution-graph { margin-top: 5px; }
-.months { display: flex; justify-content: space-between; font-size: 6px; color: #306230; margin-bottom: 2px; }
-.graph-container { display: flex; gap: 3px; }
-.days { display: flex; flex-direction: column; justify-content: space-between; font-size: 6px; color: #306230; }
-.grid { display: grid; grid-template-columns: repeat(26, 1fr); gap: 1px; flex: 1; }
-.cell { width: 6px; height: 6px; background: rgba(15, 56, 15, 0.1); border-radius: 1px; }
-.cell.level-1 { background: #0f380f; }
+.delete-btn-container {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+}
 
-.form-group { margin: 15px 0; }
-.form-group label { display: block; font-size: 8px; margin-bottom: 5px; color: #0f380f; }
-.form-group input { width: 100%; font-family: 'Press Start 2P'; font-size: 10px; padding: 5px; border: 2px solid #0f380f; background: transparent; }
+.delete-link {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  filter: grayscale(1);
+}
 
-.hint { font-size: 6px; text-align: center; color: #306230; margin-top: 10px; }
+/* New Dynamic Gitdex Grid */
+.grid { 
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 2px; 
+  justify-content: center;
+  align-content: flex-start;
+  width: 100%;
+  height: 100%; 
+  overflow: hidden;
+}
 
-.controls { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; }
-.dpad { position: relative; width: 80px; height: 80px; }
-.dpad div { position: absolute; background: #333; cursor: pointer; }
-.dpad-right { width: 26px; height: 26px; top: 27px; right: 0; border-radius: 0 3px 3px 0; }
-.dpad-left { width: 26px; height: 26px; top: 27px; left: 0; border-radius: 3px 0 0 3px; }
-.dpad-up { width: 26px; height: 26px; top: 0; left: 27px; border-radius: 3px 3px 0 0; }
-.dpad-down { width: 26px; height: 26px; bottom: 0; left: 27px; border-radius: 0 0 3px 3px; }
-.dpad-center { width: 26px; height: 26px; top: 27px; left: 27px; background: #333; }
+.cell { 
+  flex: 1 1 6px; 
+  min-width: 6px;
+  max-width: 12px; 
+  aspect-ratio: 1/1; 
+  background: rgba(0,0,0,0.1); 
+  border-radius: 1px;
+}
 
-.buttons { display: flex; gap: 15px; transform: rotate(-25deg); }
-.btn { width: 45px; height: 45px; border-radius: 50%; border: none; background: #a01050; color: white; cursor: pointer; font-family: 'Press Start 2P'; font-size: 12px; box-shadow: 0 4px 0 #600030; }
-.btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #600030; }
+/* Form Styles */
+.form-group {
+  margin: 10px 0;
+  width: 100%;
+}
 
-.bottom-controls { padding: 10px 0; text-align: center; }
-.start-select { display: flex; justify-content: center; gap: 20px; }
-.utility-btn { width: 40px; height: 10px; background: #555; border-radius: 5px; cursor: pointer; transform: rotate(-20deg); color: transparent; }
-.utility-labels { display: flex; justify-content: center; gap: 20px; font-size: 8px; color: #4a4a4a; margin-top: 5px; }
+.form-group label {
+  display: block;
+  font-size: 10px;
+  margin-bottom: 5px;
+  color: #0f380f;
+}
+
+.form-group input {
+  width: 100%;
+  font-family: sans-serif;
+  font-size: 12px;
+  padding: 8px;
+  border: 2px solid #0f380f;
+  background: rgba(255,255,255,0.2);
+}
+
+.big-color-picker {
+  height: 45px;
+  cursor: pointer;
+}
+
+.submit-btn {
+  width: 100%;
+  font-family: sans-serif;
+  font-weight: bold;
+  background: #0f380f;
+  color: #9bbc0f;
+  border: none;
+  padding: 12px;
+  font-size: 12px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+/* Gameboy Controls */
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 10px;
+}
+
+.dpad {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.dpad div {
+  position: absolute;
+  background: #333;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+}
+
+.dpad-right { width: 30px; height: 26px; top: 27px; right: 0; }
+.dpad-right::after { content: ">"; }
+
+.dpad-left { width: 30px; height: 26px; top: 27px; left: 0; }
+.dpad-left::after { content: "<"; }
+
+.dpad-up { width: 26px; height: 30px; top: 0; left: 27px; }
+.dpad-down { width: 26px; height: 30px; bottom: 0; left: 27px; }
+
+.buttons {
+  display: flex;
+  gap: 10px;
+  transform: rotate(-25deg);
+}
+
+.btn {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: none;
+  background: #a01050;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 4px 0 #600030;
+  cursor: pointer;
+}
+
+.bottom-controls {
+  text-align: center;
+  padding-top: 10px;
+}
+
+.start-select {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.utility-btn {
+  width: 40px;
+  height: 10px;
+  background: #555;
+  border-radius: 5px;
+  transform: rotate(-20deg);
+  cursor: pointer;
+}
+
+.utility-labels {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  font-size: 9px;
+  color: #4a4a4a;
+  margin-top: 8px;
+  font-weight: bold;
+}
