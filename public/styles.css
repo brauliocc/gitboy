@@ -121,18 +121,20 @@ body {
 /* New Dynamic Gitdex Grid */
 .grid { 
   display: grid; 
-  grid-template-columns: repeat(14, 1fr); 
-  gap: 3px; 
+  grid-template-columns: repeat(20, 1fr); 
+  gap: 2px; 
   justify-items: center;
   align-content: start;
   width: 100%;
   height: auto; 
   padding: 5px;
+  overflow-y: auto;
+  max-height: 180px;
 }
 
 .cell { 
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   background: rgba(0,0,0,0.1); 
   border-radius: 1px;
   display: flex;
@@ -141,9 +143,9 @@ body {
   box-sizing: border-box;
 }
 
-.cell.selected {
-  border: 1px solid #000;
-  box-shadow: 0 0 2px rgba(0,0,0,0.5);
+.cell.navigating {
+  outline: 1px solid #000;
+  background: rgba(255, 255, 255, 0.3);
 }
 
 /* Form Styles */

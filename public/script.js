@@ -93,17 +93,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const habit = state.habits[state.currentIndex];
     if (!habit) return;
 
-    // Fixed 182-day grid (26 weeks) to fit screen better
-    const totalDays = 182;
+    const totalDays = 365;
     const today = new Date();
-    
+    const year = today.getFullYear();
+    const startDate = new Date(year, 0, 1);
+    const todayKey = getTodayKey();
+
     if (state.selectedDateIndex === null) {
-      state.selectedDateIndex = totalDays - 1; // Default to today
+      // Find today's index in the 365 day array
+      const diffTime = Math.abs(today - startDate);
+      state.selectedDateIndex = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     }
 
     for (let i = 0; i < totalDays; i++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() - (totalDays - 1 - i));
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + i);
       const key = date.toISOString().split("T")[0];
       
       const cell = document.createElement("div");
@@ -113,14 +117,21 @@ document.addEventListener("DOMContentLoaded", () => {
         cell.style.backgroundColor = habit.color;
       }
 
+      // Highlight current navigation position
       if (i === state.selectedDateIndex) {
-        cell.classList.add("selected");
+        cell.classList.add("navigating");
+        cell.style.outline = "1px solid #000";
+      }
+
+      // Mark the actual "Today" with an X
+      if (key === todayKey) {
         cell.textContent = "X";
         cell.style.color = "#000";
         cell.style.fontSize = "6px";
         cell.style.display = "flex";
         cell.style.alignItems = "center";
         cell.style.justifyContent = "center";
+        cell.style.fontWeight = "bold";
       }
 
       elements.grid.appendChild(cell);
@@ -149,9 +160,27 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
+  function toggleHabitAtSelection() {
+    if (state.view === "graph" && state.habits.length) {
+      const habit = state.habits[state.currentIndex];
+      const startDate = new Date(new Date().getFullYear(), 0, 1);
+      const targetDate = new Date(startDate);
+      targetDate.setDate(startDate.getDate() + state.selectedDateIndex);
+      const key = targetDate.toISOString().split("T")[0];
+
+      if (habit.history[key]) {
+        delete habit.history[key];
+      } else {
+        habit.history[key] = true;
+      }
+      save();
+      renderGraph();
+    }
+  }
+
   document.getElementById("btn-next").onclick = () => {
     if (state.view === "graph") {
-      state.selectedDateIndex = Math.min(181, state.selectedDateIndex + 1);
+      state.selectedDateIndex = Math.min(364, state.selectedDateIndex + 1);
       renderGraph();
     } else if (state.habits.length) {
       state.currentIndex = (state.currentIndex + 1) % state.habits.length;
@@ -179,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("btn-down").onclick = () => {
     if (state.view === "graph") {
-      state.selectedDateIndex = Math.min(181, state.selectedDateIndex + 7);
+      state.selectedDateIndex = Math.min(364, state.selectedDateIndex + 7);
       renderGraph();
     }
   };
@@ -189,6 +218,8 @@ document.addEventListener("DOMContentLoaded", () => {
       state.habits[state.currentIndex].history[getTodayKey()] = true;
       save();
       updateUI();
+    } else if (state.view === "graph") {
+      toggleHabitAtSelection();
     }
   };
 
@@ -197,6 +228,8 @@ document.addEventListener("DOMContentLoaded", () => {
       delete state.habits[state.currentIndex].history[getTodayKey()];
       save();
       updateUI();
+    } else if (state.view === "graph") {
+      toggleHabitAtSelection();
     }
   };
 
